@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject Ball;
+    public GameObject[] Balls;
     public GameObject FirePoint;
     public float BallForce;
+    private int ActiveBallIndex;
     void Start()
     {
         
@@ -17,9 +18,19 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.T))
         {
-            GameObject tp = Instantiate(Ball,FirePoint.transform.position,FirePoint.transform.rotation);
+            Balls[ActiveBallIndex].transform.SetPositionAndRotation( FirePoint.transform.position, FirePoint.transform.rotation);
+            Balls[ActiveBallIndex].SetActive(true);
+            Balls[ActiveBallIndex].GetComponent<Rigidbody>().AddForce(Balls[ActiveBallIndex].transform.TransformDirection(90,90,0) * BallForce,ForceMode.Force);
 
-            tp.GetComponent<Rigidbody>().AddForce(tp.transform.TransformDirection(90,90,0) * BallForce,ForceMode.Force);
+            if (Balls.Length -1 ==ActiveBallIndex)
+            {
+                ActiveBallIndex = 0;
+            }
+            else
+            {
+                ActiveBallIndex++;
+
+            }
         }
     }
 }
