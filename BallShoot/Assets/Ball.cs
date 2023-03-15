@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Ball : MonoBehaviour
 {
+    public GameManager _gameManager;
     private Rigidbody rb;
 
     void Start()
@@ -23,6 +24,7 @@ public class Ball : MonoBehaviour
             //parc eff
             //numbers update
             //slider
+            _gameManager.BallEntered();
         }
        else if (other.CompareTag("BottomObject"))
         {
@@ -31,6 +33,7 @@ public class Ball : MonoBehaviour
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             gameObject.SetActive(false);
+            _gameManager.BallNotEntered();
         }
     }
 }
