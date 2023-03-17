@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 public class GameManager : MonoBehaviour
@@ -17,6 +18,14 @@ public class GameManager : MonoBehaviour
     private int GrnBallSys;
     public Slider LevelSlider;
     public TextMeshProUGUI KlnBallSys_Text;
+
+    [Header("----UI SETTINGS")] 
+    public GameObject[] Panels;
+    public TextMeshProUGUI StarNumber;
+    public TextMeshProUGUI Win_Level_Number;
+    public TextMeshProUGUI Lost_Level_Number;
+
+
     void Start()
     {
         LevelSlider.maxValue = HdfBallSys;
@@ -29,18 +38,25 @@ public class GameManager : MonoBehaviour
         LevelSlider.value = GrnBallSys;
         if (GrnBallSys==HdfBallSys)
         {
-            // ball lock
-            Debug.Log("Win");
+            PlayerPrefs.SetInt("Level",SceneManager.GetActiveScene().buildIndex + 1);
+            PlayerPrefs.SetInt("Star",PlayerPrefs.GetInt("Star")+15);
+            StarNumber.text = PlayerPrefs.GetInt("Star").ToString();
+            Win_Level_Number.text ="LEVEL : "+ SceneManager.GetActiveScene().name;
+            Panels[1].SetActive(true);
         }
 
         if (MvctBallSys==0 && GrnBallSys!=HdfBallSys)
         {
-            Debug.Log("Lost");
+            Lost_Level_Number.text = "LEVEL : " + SceneManager.GetActiveScene().name;
+            Panels[2].SetActive(true);
+
 
         }
         if ((MvctBallSys + GrnBallSys) < HdfBallSys)
         {
-            Debug.Log("Lost");
+            Lost_Level_Number.text = "LEVEL : " + SceneManager.GetActiveScene().name;
+            Panels[2].SetActive(true);
+
 
         }
     }
@@ -48,16 +64,19 @@ public class GameManager : MonoBehaviour
     {
         if (MvctBallSys==0)
         {
-            Debug.Log("Lost");
+            Lost_Level_Number.text = "LEVEL : " + SceneManager.GetActiveScene().name;
+
+            Panels[2].SetActive(true);
 
         }
 
         if ((MvctBallSys+GrnBallSys)<HdfBallSys)
         {
-            Debug.Log("Lost");
-            
+            Lost_Level_Number.text = "LEVEL : " + SceneManager.GetActiveScene().name;
+            Panels[2].SetActive(true);
+
         }
-        
+
     }
 
     void Update()
@@ -79,6 +98,39 @@ public class GameManager : MonoBehaviour
                 ActiveBallIndex++;
 
             }
+        }
+    }
+
+
+    public void PauseGame()
+    {
+        Panels[0].SetActive(true);
+        Time.timeScale = 0;
+    }
+
+    public void PanelButtonsProcess(string process)
+    {
+        switch (process)
+        {
+            case "Resume": 
+                Time.timeScale = 1;
+                Panels[0].SetActive(false);
+                break;
+            case "Exit":
+                Application.Quit();
+                break;
+            case "Settings":
+                //Optional
+                break;
+            case "Retry":
+                Time.timeScale = 1;
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                break;
+            case "Next":
+                Time.timeScale = 1;
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
+                break;
+
         }
     }
 }

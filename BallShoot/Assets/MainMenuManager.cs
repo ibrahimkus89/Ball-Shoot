@@ -16,6 +16,7 @@ public class MainMenuManager : MonoBehaviour
         else
         {
             PlayerPrefs.SetInt("Level",1);
+            PlayerPrefs.SetInt("Star", 0);
             SceneManager.LoadScene(1);
         }
     }
