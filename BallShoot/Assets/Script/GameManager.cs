@@ -7,34 +7,34 @@ using TMPro;
 public class GameManager : MonoBehaviour
 {
     [Header("----BALL SETTINGS")]
-    public GameObject[] Balls;
-    public GameObject FirePoint;
+    [SerializeField] private GameObject[] Balls;
+    [SerializeField] private GameObject FirePoint;
     [SerializeField] private float BallForce;
     private int ActiveBallIndex;
-    public Animator _Ball_Animator;
-    public ParticleSystem _Ball_Throw_Effect;
-    public ParticleSystem[] BallEffects;
+    [SerializeField] private Animator _Ball_Animator;
+    [SerializeField] private ParticleSystem _Ball_Throw_Effect;
+    [SerializeField] private ParticleSystem[] BallEffects;
     private int ActiveBallEffectIndex;
-    public AudioSource[] BallSounds;
+    [SerializeField] private AudioSource[] BallSounds;
     private int ActiveBallSoundIndex;
 
     [Header("----LEVEL SETTINGS")]
     [SerializeField]private int HdfBallSys;
     [SerializeField] private int MvctBallSys;
     private int GrnBallSys;
-    public Slider LevelSlider;
-    public TextMeshProUGUI KlnBallSys_Text;
+    [SerializeField] private Slider LevelSlider;
+    [SerializeField] private TextMeshProUGUI KlnBallSys_Text;
 
-    [Header("----UI SETTINGS")] 
-    public GameObject[] Panels;
-    public TextMeshProUGUI StarNumber;
-    public TextMeshProUGUI Win_Level_Number;
-    public TextMeshProUGUI Lost_Level_Number;
+    [Header("----UI SETTINGS")]
+    [SerializeField] private GameObject[] Panels;
+    [SerializeField] private TextMeshProUGUI StarNumber;
+    [SerializeField] private TextMeshProUGUI Win_Level_Number;
+    [SerializeField] private TextMeshProUGUI Lost_Level_Number;
 
     [Header("----OTHER SETTINGS")]
-    public Renderer BucketTransparent; 
+    [SerializeField] private Renderer BucketTransparent; 
     [SerializeField] private AudioSource[] Other_Sound;
-   
+    private string Level_Name;
 
 
     private float Bucket_st_value;
@@ -43,6 +43,8 @@ public class GameManager : MonoBehaviour
     {
         ActiveBallEffectIndex = 0;
         ActiveBallSoundIndex = 0;
+        Level_Name = SceneManager.GetActiveScene().name;
+
         Bucket_st_value = .5f;
         Bucket_Step_value =.25f / HdfBallSys;
         
@@ -71,47 +73,72 @@ public class GameManager : MonoBehaviour
         }
         if (GrnBallSys==HdfBallSys)
         {
+            Time.timeScale = 0;
             Other_Sound[1].Play();
             PlayerPrefs.SetInt("Level",SceneManager.GetActiveScene().buildIndex + 1);
             PlayerPrefs.SetInt("Star",PlayerPrefs.GetInt("Star")+15);
             StarNumber.text = PlayerPrefs.GetInt("Star").ToString();
-            Win_Level_Number.text ="LEVEL : "+ SceneManager.GetActiveScene().name;
+            Win_Level_Number.text ="LEVEL : "+ Level_Name;
             Panels[1].SetActive(true);
         }
 
-        if (MvctBallSys==0 && GrnBallSys!=HdfBallSys)
+        int Number = 0;
+        foreach (var item in Balls)
         {
-            Other_Sound[0].Play();
-            Lost_Level_Number.text = "LEVEL : " + SceneManager.GetActiveScene().name;
-            Panels[2].SetActive(true);
-
-
+            if (item.activeInHierarchy)
+            {
+                Number++;
+            }
         }
-        if ((MvctBallSys + GrnBallSys) < HdfBallSys)
+
+        if (Number==0)
         {
-            Other_Sound[0].Play();
-            Lost_Level_Number.text = "LEVEL : " + SceneManager.GetActiveScene().name;
-            Panels[2].SetActive(true);
-
-
+            if (MvctBallSys == 0 && GrnBallSys != HdfBallSys)
+            {
+                Lost();
+            }
+            if ((MvctBallSys + GrnBallSys) < HdfBallSys)
+            {
+                Lost();
+            }
         }
+
+        
     }
     public void BallNotEntered()
     {
+        int Number = 0;
+        foreach (var item in Balls)
+        {
+            if (item.activeInHierarchy)
+            {
+                Number++;
+            }
+        }
+
+        if (Number == 0)
+        {
+            if (MvctBallSys == 0 && GrnBallSys != HdfBallSys)
+            {
+                Lost();
+            }
+            if ((MvctBallSys + GrnBallSys) < HdfBallSys)
+            {
+                Lost();
+            }
+        }
+
         if (MvctBallSys==0)
         {
-            Other_Sound[0].Play();
-            Lost_Level_Number.text = "LEVEL : " + SceneManager.GetActiveScene().name;
+           Lost();
 
-            Panels[2].SetActive(true);
 
         }
 
         if ((MvctBallSys+GrnBallSys)<HdfBallSys)
         {
-            Other_Sound[0].Play();
-            Lost_Level_Number.text = "LEVEL : " + SceneManager.GetActiveScene().name;
-            Panels[2].SetActive(true);
+            
+            Lost();
 
         }
 
@@ -119,28 +146,35 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T))
+        if (Time.timeScale != 0)
         {
-            MvctBallSys--;
-            KlnBallSys_Text.text = MvctBallSys.ToString();
-            _Ball_Animator.Play("Ball_Atr");
-            _Ball_Throw_Effect.Play();
-            Other_Sound[2].Play();
-            Balls[ActiveBallIndex].transform.SetPositionAndRotation( FirePoint.transform.position, FirePoint.transform.rotation);
-            Balls[ActiveBallIndex].SetActive(true);
-            Balls[ActiveBallIndex].GetComponent<Rigidbody>().AddForce(Balls[ActiveBallIndex].transform.TransformDirection(90,90,0) * BallForce,ForceMode.Force);
-
-            if (Balls.Length -1 ==ActiveBallIndex)
+            if (Input.GetKeyDown(KeyCode.T))
             {
-                ActiveBallIndex = 0;
-            }
-            else
-            {
-                ActiveBallIndex++;
+                MvctBallSys--;
+                KlnBallSys_Text.text = MvctBallSys.ToString();
+                _Ball_Animator.Play("Ball_Atr");
+                _Ball_Throw_Effect.Play();
+                Other_Sound[2].Play();
+                Balls[ActiveBallIndex].transform
+                    .SetPositionAndRotation(FirePoint.transform.position, FirePoint.transform.rotation);
+                Balls[ActiveBallIndex].SetActive(true);
+                Balls[ActiveBallIndex].GetComponent<Rigidbody>().AddForce(
+                    Balls[ActiveBallIndex].transform.TransformDirection(90, 90, 0) * BallForce, ForceMode.Force);
 
+                if (Balls.Length - 1 == ActiveBallIndex)
+                {
+                    ActiveBallIndex = 0;
+                }
+                else
+                {
+                    ActiveBallIndex++;
+
+                }
             }
         }
-    }
+
+    
+}
 
 
     public void PauseGame()
@@ -188,5 +222,13 @@ public class GameManager : MonoBehaviour
         {
             ActiveBallEffectIndex = 0;
         }
+    }
+
+    void Lost()
+    {
+        Time.timeScale = 0;
+        Other_Sound[0].Play();
+        Lost_Level_Number.text = "LEVEL : " + Level_Name;
+        Panels[2].SetActive(true);
     }
 }
