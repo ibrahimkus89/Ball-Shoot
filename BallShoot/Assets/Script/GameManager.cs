@@ -29,33 +29,33 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI Win_Level_Number;
     public TextMeshProUGUI Lost_Level_Number;
 
+    [Header("----OTHER SETTINGS")]
+    public Renderer BucketTransparent;
 
+    private float Bucket_st_value;
+    private float Bucket_Step_value;
     void Start()
     {
         ActiveBallEffectIndex = 0;
+        Bucket_st_value = .5f;
+        Bucket_Step_value =.25f / HdfBallSys;
+        Debug.Log(Bucket_Step_value);
+
         LevelSlider.maxValue = HdfBallSys;
         KlnBallSys_Text.text = MvctBallSys.ToString();
+        //BucketTransparent.material.SetTextureScale("_MainTex",new Vector2(1f,.30f));
     }
 
-    public void ParcEffect(Vector3 Pos,Color _color)
-    {
-        BallEffects[ActiveBallEffectIndex].transform.position = Pos;
-
-        var main = BallEffects[ActiveBallEffectIndex].main;
-        main.startColor =_color;
-        BallEffects[ActiveBallEffectIndex].gameObject.SetActive(true);
-        ActiveBallEffectIndex++;
-
-        if (ActiveBallEffectIndex==BallEffects.Length-1)
-        {
-            ActiveBallEffectIndex = 0;
-        }
-    }
+   
 
     public void BallEntered()
     {
         GrnBallSys++;
         LevelSlider.value = GrnBallSys;
+
+        Bucket_st_value -= Bucket_Step_value;
+
+        BucketTransparent.material.SetTextureScale("_MainTex",new Vector2(1f,Bucket_st_value));
         if (GrnBallSys==HdfBallSys)
         {
             PlayerPrefs.SetInt("Level",SceneManager.GetActiveScene().buildIndex + 1);
@@ -153,6 +153,21 @@ public class GameManager : MonoBehaviour
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
                 break;
 
+        }
+    }
+
+    public void ParcEffect(Vector3 Pos, Color _color)
+    {
+        BallEffects[ActiveBallEffectIndex].transform.position = Pos;
+
+        var main = BallEffects[ActiveBallEffectIndex].main;
+        main.startColor = _color;
+        BallEffects[ActiveBallEffectIndex].gameObject.SetActive(true);
+        ActiveBallEffectIndex++;
+
+        if (ActiveBallEffectIndex == BallEffects.Length - 1)
+        {
+            ActiveBallEffectIndex = 0;
         }
     }
 }

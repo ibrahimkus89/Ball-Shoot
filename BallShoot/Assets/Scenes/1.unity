@@ -5536,6 +5536,7 @@ MonoBehaviour:
   StarNumber: {fileID: 1208003594}
   Win_Level_Number: {fileID: 75258940}
   Lost_Level_Number: {fileID: 1264798759}
+  BucketTransparent: {fileID: 3222905877048835300}
 --- !u!4 &1563692564
 Transform:
   m_ObjectHideFlags: 0
