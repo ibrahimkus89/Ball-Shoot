@@ -15,6 +15,8 @@ public class GameManager : MonoBehaviour
     public ParticleSystem _Ball_Throw_Effect;
     public ParticleSystem[] BallEffects;
     private int ActiveBallEffectIndex;
+    public AudioSource[] BallSounds;
+    private int ActiveBallSoundIndex;
 
     [Header("----LEVEL SETTINGS")]
     [SerializeField]private int HdfBallSys;
@@ -30,20 +32,23 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI Lost_Level_Number;
 
     [Header("----OTHER SETTINGS")]
-    public Renderer BucketTransparent;
+    public Renderer BucketTransparent; 
+    [SerializeField] private AudioSource[] Other_Sound;
+   
+
 
     private float Bucket_st_value;
     private float Bucket_Step_value;
     void Start()
     {
         ActiveBallEffectIndex = 0;
+        ActiveBallSoundIndex = 0;
         Bucket_st_value = .5f;
         Bucket_Step_value =.25f / HdfBallSys;
-        Debug.Log(Bucket_Step_value);
-
+        
         LevelSlider.maxValue = HdfBallSys;
         KlnBallSys_Text.text = MvctBallSys.ToString();
-        //BucketTransparent.material.SetTextureScale("_MainTex",new Vector2(1f,.30f));
+        
     }
 
    
@@ -56,8 +61,17 @@ public class GameManager : MonoBehaviour
         Bucket_st_value -= Bucket_Step_value;
 
         BucketTransparent.material.SetTextureScale("_MainTex",new Vector2(1f,Bucket_st_value));
+
+        BallSounds[ActiveBallSoundIndex].Play();
+        ActiveBallSoundIndex++;
+
+        if (ActiveBallSoundIndex == BallSounds.Length - 1)
+        {
+            ActiveBallSoundIndex= 0;
+        }
         if (GrnBallSys==HdfBallSys)
         {
+            Other_Sound[1].Play();
             PlayerPrefs.SetInt("Level",SceneManager.GetActiveScene().buildIndex + 1);
             PlayerPrefs.SetInt("Star",PlayerPrefs.GetInt("Star")+15);
             StarNumber.text = PlayerPrefs.GetInt("Star").ToString();
@@ -67,6 +81,7 @@ public class GameManager : MonoBehaviour
 
         if (MvctBallSys==0 && GrnBallSys!=HdfBallSys)
         {
+            Other_Sound[0].Play();
             Lost_Level_Number.text = "LEVEL : " + SceneManager.GetActiveScene().name;
             Panels[2].SetActive(true);
 
@@ -74,6 +89,7 @@ public class GameManager : MonoBehaviour
         }
         if ((MvctBallSys + GrnBallSys) < HdfBallSys)
         {
+            Other_Sound[0].Play();
             Lost_Level_Number.text = "LEVEL : " + SceneManager.GetActiveScene().name;
             Panels[2].SetActive(true);
 
@@ -84,6 +100,7 @@ public class GameManager : MonoBehaviour
     {
         if (MvctBallSys==0)
         {
+            Other_Sound[0].Play();
             Lost_Level_Number.text = "LEVEL : " + SceneManager.GetActiveScene().name;
 
             Panels[2].SetActive(true);
@@ -92,6 +109,7 @@ public class GameManager : MonoBehaviour
 
         if ((MvctBallSys+GrnBallSys)<HdfBallSys)
         {
+            Other_Sound[0].Play();
             Lost_Level_Number.text = "LEVEL : " + SceneManager.GetActiveScene().name;
             Panels[2].SetActive(true);
 
@@ -107,6 +125,7 @@ public class GameManager : MonoBehaviour
             KlnBallSys_Text.text = MvctBallSys.ToString();
             _Ball_Animator.Play("Ball_Atr");
             _Ball_Throw_Effect.Play();
+            Other_Sound[2].Play();
             Balls[ActiveBallIndex].transform.SetPositionAndRotation( FirePoint.transform.position, FirePoint.transform.rotation);
             Balls[ActiveBallIndex].SetActive(true);
             Balls[ActiveBallIndex].GetComponent<Rigidbody>().AddForce(Balls[ActiveBallIndex].transform.TransformDirection(90,90,0) * BallForce,ForceMode.Force);
