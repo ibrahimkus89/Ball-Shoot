@@ -11,6 +11,10 @@ public class GameManager : MonoBehaviour
     public GameObject FirePoint;
     [SerializeField] private float BallForce;
     private int ActiveBallIndex;
+    public Animator _Ball_Animator;
+    public ParticleSystem _Ball_Throw_Effect;
+    public ParticleSystem[] BallEffects;
+    private int ActiveBallEffectIndex;
 
     [Header("----LEVEL SETTINGS")]
     [SerializeField]private int HdfBallSys;
@@ -28,8 +32,24 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        ActiveBallEffectIndex = 0;
         LevelSlider.maxValue = HdfBallSys;
         KlnBallSys_Text.text = MvctBallSys.ToString();
+    }
+
+    public void ParcEffect(Vector3 Pos,Color _color)
+    {
+        BallEffects[ActiveBallEffectIndex].transform.position = Pos;
+
+        var main = BallEffects[ActiveBallEffectIndex].main;
+        main.startColor =_color;
+        BallEffects[ActiveBallEffectIndex].gameObject.SetActive(true);
+        ActiveBallEffectIndex++;
+
+        if (ActiveBallEffectIndex==BallEffects.Length-1)
+        {
+            ActiveBallEffectIndex = 0;
+        }
     }
 
     public void BallEntered()
@@ -85,6 +105,8 @@ public class GameManager : MonoBehaviour
         {
             MvctBallSys--;
             KlnBallSys_Text.text = MvctBallSys.ToString();
+            _Ball_Animator.Play("Ball_Atr");
+            _Ball_Throw_Effect.Play();
             Balls[ActiveBallIndex].transform.SetPositionAndRotation( FirePoint.transform.position, FirePoint.transform.rotation);
             Balls[ActiveBallIndex].SetActive(true);
             Balls[ActiveBallIndex].GetComponent<Rigidbody>().AddForce(Balls[ActiveBallIndex].transform.TransformDirection(90,90,0) * BallForce,ForceMode.Force);
