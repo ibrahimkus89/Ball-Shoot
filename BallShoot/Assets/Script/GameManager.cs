@@ -53,8 +53,6 @@ public class GameManager : MonoBehaviour
         
     }
 
-   
-
     public void BallEntered()
     {
         GrnBallSys++;
@@ -131,50 +129,14 @@ public class GameManager : MonoBehaviour
         if (MvctBallSys==0)
         {
            Lost();
-
-
         }
 
         if ((MvctBallSys+GrnBallSys)<HdfBallSys)
         {
-            
             Lost();
-
         }
 
     }
-
-    void Update()
-    {
-        if (Time.timeScale != 0)
-        {
-            if (Input.GetKeyDown(KeyCode.T))
-            {
-                MvctBallSys--;
-                KlnBallSys_Text.text = MvctBallSys.ToString();
-                _Ball_Animator.Play("Ball_Atr");
-                _Ball_Throw_Effect.Play();
-                Other_Sound[2].Play();
-                Balls[ActiveBallIndex].transform
-                    .SetPositionAndRotation(FirePoint.transform.position, FirePoint.transform.rotation);
-                Balls[ActiveBallIndex].SetActive(true);
-                Balls[ActiveBallIndex].GetComponent<Rigidbody>().AddForce(
-                    Balls[ActiveBallIndex].transform.TransformDirection(90, 90, 0) * BallForce, ForceMode.Force);
-
-                if (Balls.Length - 1 == ActiveBallIndex)
-                {
-                    ActiveBallIndex = 0;
-                }
-                else
-                {
-                    ActiveBallIndex++;
-
-                }
-            }
-        }
-
-    
-}
 
 
     public void PauseGame()
@@ -231,4 +193,32 @@ public class GameManager : MonoBehaviour
         Lost_Level_Number.text = "LEVEL : " + Level_Name;
         Panels[2].SetActive(true);
     }
+
+    public void Ball_Throw()
+    {
+        if (Time.timeScale!=0)
+        {
+            MvctBallSys--;
+            KlnBallSys_Text.text = MvctBallSys.ToString();
+            _Ball_Animator.Play("Ball_Atr");
+            _Ball_Throw_Effect.Play();
+            Other_Sound[2].Play();
+            Balls[ActiveBallIndex].transform
+                .SetPositionAndRotation(FirePoint.transform.position, FirePoint.transform.rotation);
+            Balls[ActiveBallIndex].SetActive(true);
+            Balls[ActiveBallIndex].GetComponent<Rigidbody>().AddForce(
+                Balls[ActiveBallIndex].transform.TransformDirection(90, 90, 0) * BallForce, ForceMode.Force);
+
+            if (Balls.Length - 1 == ActiveBallIndex)
+            {
+                ActiveBallIndex = 0;
+            }
+            else
+            {
+                ActiveBallIndex++;
+
+            }
+        }
+    }
 }
+
